@@ -52,7 +52,7 @@ class Hyperparameters:
 
     # Training length.
     iterations = int(os.environ.get("ITERATIONS", 20000))
-    warmdown_iters = int(os.environ.get("WARMDOWN_ITERS", 1200))
+    warmdown_iters = int(os.environ.get("WARMDOWN_ITERS", 1500))
     warmup_steps = int(os.environ.get("WARMUP_STEPS", 20))
     train_batch_tokens = int(os.environ.get("TRAIN_BATCH_TOKENS", 524_288))
     train_seq_len = int(os.environ.get("TRAIN_SEQ_LEN", 1024))
@@ -609,7 +609,7 @@ class MLP(nn.Module):
         super().__init__()
         # Match parameter count: 2*dim*hidden (old) ≈ 3*dim*hidden_new
         hidden = (2 * mlp_mult * dim) // 3
-        hidden = (hidden + 63) // 64 * 64  # round up to multiple of 64
+        hidden = (hidden // 8) * 8  # round to multiple of 8
         self.gate = CastedLinear(dim, hidden, bias=False)
         self.up = CastedLinear(dim, hidden, bias=False)
         self.down = CastedLinear(hidden, dim, bias=False)
